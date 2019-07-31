@@ -1,6 +1,8 @@
 ﻿using ETM.WCCOA;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using WCCOAPing.reduNumber;
 
 namespace WCCOAPing.Dp
@@ -8,53 +10,72 @@ namespace WCCOAPing.Dp
     class WccDp : IDp
     {
         OaManager manager;
-        IReduNum reduNum;
         string systemName;
 
-        public WccDp(OaManager manager, IReduNum reduNum)
+        public WccDp(OaManager manager)
         {
             this.manager = manager;
-            this.reduNum = reduNum;
             systemName = manager.GetCurrentSystemName();
         }
 
-        public List<string> ReadDpNames(string dptName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Dictionary<string, dynamic> ReadDpValue(List<string> name)
-        {
-
-            throw new NotImplementedException();
-        }
-
-        public dynamic ReadDpValue(string dpNameElement)
+        public List<string> GetDpNamesByDPTName(string dptName)
         {
             try
             {
-                return manager.ProcessValues.GetDpValue(systemName+":"+dpNameElement).DpValue;
+                OaProcessModel values = manager.ProcessModel;
+                var dptAllIds = values.GetAllDpIdsForPattern("*", dptName);
+                string dptIds = dptAllIds.FirstOrDefault().ToString();
+                short typeId = Convert.ToInt16(dptIds.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+
+                OaDataPointType oaData = new OaDataPointType(manager, manager.GetCurrentSystemId(), typeId);
+                return oaData.GetAllDataPointNames().ToList();
             }
             catch (Exception e)
             {
-                Console.WriteLine("Errors: " + e);
+                Console.WriteLine("Errors (class WccDp function GetDpNamesByDPTName)" + e);
+                manager.Stop();
                 return null;
             }
         }
 
-        public void WriteDpeValue(string dpName, bool value)
+        public Dictionary<string, dynamic> ReadDpValue(List<string> dpNames, string node)
         {
-            throw new NotImplementedException();
+            Dictionary<string, dynamic> result = new Dictionary<string, dynamic>();
+            foreach (var v in dpNames)
+            {
+                result.Add(v, ReadDpValue(v, node));
+            }
+            return result;
         }
 
-        public void WriteDpStatus(Dictionary<string, bool> statusPairs)
+        public OaVariant ReadDpValue(string dpName, string node)
+        {
+            OaVariant variant = null;
+            try
+            {
+                variant = manager.ProcessValues.GetDpValue($"{systemName}:{dpName}.{node}:_original.._value").DpValue;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Errors: " + e);
+                variant = null;
+            }
+            return variant;
+        }
+
+        public async void WriteDpeValue(string dpName, string node, dynamic value)
         {
             OaProcessValues valueAccess = manager.ProcessValues;
-            foreach (var value in statusPairs)
+            await valueAccess.SetDpValueAsync($"{systemName}:{dpName}.{node}:_original.._value", value);
+        }
+
+        public void WriteDpeValue(Dictionary<string, bool> valuePairs, string node)
+        {
+            foreach (var value in valuePairs)
             {
                 try
-                {                    
-                    valueAccess.SetDpValueAsync(CreateDpeStatusName(systemName + ":"+value.Key), value.Value).Wait();
+                {
+                    WriteDpeValue(value.Key, node, value.Value);
                 }
                 catch (Exception e)
                 {
@@ -63,11 +84,9 @@ namespace WCCOAPing.Dp
             }
         }
 
-        string CreateDpeStatusName(string dpName)
+        public void WriteDpeValue(Dictionary<string, string> valuePairs, string node)
         {
-            string dpeName = $"{dpName}.isConnected";
-            string tail = ":_original.._value";
-            return reduNum.GetReduNum() == 1 ? dpeName + tail : $"{dpeName}_{reduNum.GetReduNum()}{tail}";
+            throw new NotImplementedException();
         }
     }
 }

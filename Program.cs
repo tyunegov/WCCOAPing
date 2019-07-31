@@ -1,46 +1,50 @@
-﻿using ETM.WCCOA;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WCCOAPing.Dp;
 using WCCOAPing.Factory;
 using WCCOAPing.Ip;
 using WCCOAPing.Ping;
+using WCCOAPing.reduNumber;
 
 namespace WCCOAPing
 {
     class Program
     {
-        static bool isFirstRun;
+        static bool isFirstRun = true;
+        static IDp dp;
+        static IIp ip;
+        static IPing ping;
+        static IReduNum redu;
         static void Main(string[] args)
-        { 
-            ManagerWcc wcc = new ManagerWcc(args);
-            
-            IDp dp = new WccDp(wcc.MyManager, new reduNumber.ReduNumConfig());
-            //   IIp ip = new WccIp(wcc.MyManager);
-            IIp ip = new ConfigIp(dp);
-            IPing ping = new NetworkPing();
+        {
+            var manager = new ManagerWcc(args);
+            dp = new WccDp(manager.MyManager);
+            ip = new WccIp(manager.MyManager, dp);
+            ping = new EthernetPing();
+            redu = new ReduNumConfig();
 
-            Dictionary<string, string> ipPairs = ip.GetIp();
-            Dictionary<string, bool> dictionaryPairs = ping.GetStatus(ipPairs); 
-            dp.WriteDpStatus(dictionaryPairs);
-
-            if (isFirstRun)
+            try
             {
-                isFirstRun = false;
-                Console.WriteLine("Manager is running");
+                while (true)
+                {
+                    Dictionary<string, bool> pingPairs = new Dictionary<string, bool>();
+                    pingPairs = ping.GetStatus(ip.GetIp());
+                    dp.WriteDpeValue(pingPairs, "isConnected" + (redu.GetReduNum() == 1 ? "" : $"_{redu.GetReduNum()}"));
+
+                    if (isFirstRun)
+                    {
+                        Console.WriteLine("Manager is start");
+                        isFirstRun = false;
+                    }
+                    Thread.Sleep(500);
+                }
             }
-            /*
-             * Реализовано:
-             * GetStatus();
-             * WriteDpStatus();
-             * new WccDp();
-             *
-             * Не сделано:
-             * GetIp()
-             */
+            catch (Exception e)
+            {
+                Console.WriteLine("Errors (class Program function Main): " + e);
+            }
         }
     }
 }

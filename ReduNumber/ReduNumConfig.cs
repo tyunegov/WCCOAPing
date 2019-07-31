@@ -28,7 +28,7 @@ namespace WCCOAPing.reduNumber
             }
             catch (Exception e)
             {
-                Console.WriteLine("Errors: " + e);
+                Console.WriteLine("Errors (Class ReduNumConfig function GetReduNum) " + e);
                 return 1;
             }
         }

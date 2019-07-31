@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using ETM.WCCOA;
 
 namespace WCCOAPing.Dp
 {
     interface IDp
     {
-        List<string> ReadDpNames(string dptName);
-        dynamic ReadDpValue(string dpNameElement);
-        Dictionary<string, dynamic> ReadDpValue(List<string> name);
-        void WriteDpeValue(string dpName, bool value);
-        void WriteDpStatus(Dictionary<string, bool> statusPairs);
+        List<string> GetDpNamesByDPTName(string dptName);
+        Dictionary<string, dynamic> ReadDpValue(List<string> dpNames, string node);
+        OaVariant ReadDpValue(string dpName, string node);
+        void WriteDpeValue(Dictionary<string, bool> valuePairs, string node);
+        void WriteDpeValue(Dictionary<string, string> valuePairs, string node);
+        void WriteDpeValue(string dpName, string node, dynamic value);
     }
 }

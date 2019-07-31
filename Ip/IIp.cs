@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace WCCOAPing.Ip
+namespace WCCOAPing.Factory
 {
-    internal interface IIp
+    interface IIp
     {
         Dictionary<string, string> GetIp();
     }

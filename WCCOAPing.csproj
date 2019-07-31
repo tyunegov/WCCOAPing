@@ -55,7 +55,7 @@
     <Compile Include="Ip\WccIp.cs" />
     <Compile Include="Manager\ManagerWcc.cs" />
     <Compile Include="Ping\IPing.cs" />
-    <Compile Include="Ping\NetworkPing.cs" />
+    <Compile Include="Ping\EthernetPing.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReduNumber\ReduNumConfig.cs" />
@@ -64,8 +64,6 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="WccPing\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

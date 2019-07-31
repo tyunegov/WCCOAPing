@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using WCCOAPing.Dp;
+using WCCOAPing.Factory;
 
 namespace WCCOAPing.Ip
 {
-    class ConfigIp : IIp
+    class ConfigIp
     {
         IDp dp;
         public ConfigIp(IDp dp)
@@ -18,24 +17,24 @@ namespace WCCOAPing.Ip
         }
         public Dictionary<string, string> GetIp()
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
-            try
-            {
-                string startupPath = Assembly.GetExecutingAssembly().Location;
-                startupPath = startupPath.Substring(0, startupPath.Length - 18);
-                startupPath += @"\config\config.ping";
-
-                foreach(var value in File.ReadAllLines(startupPath))
+            Dictionary<string, string> result = new Dictionary<string, string>();            
+                try
                 {
-                    result.Add(value, dp.ReadDpValue($"{value}.ip:_original.._value"));
+                    string startupPath = Assembly.GetExecutingAssembly().Location;
+                    startupPath = startupPath.Substring(0, startupPath.Length - 18);
+                    startupPath += @"\config\config.ping";
+
+                    foreach (var value in File.ReadAllLines(startupPath))
+                    {
+                        result.Add(value, dp.ReadDpValue(value, "ip").ToString());
+                    }                    
                 }
-                return result;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Errors: " + e);
-                return null;
-            }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Errors (class ConfigIp function GetIp) " + e);
+                    result =  null;
+                }           
+            return result;
         }
     }
 }
