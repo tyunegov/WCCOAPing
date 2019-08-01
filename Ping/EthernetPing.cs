@@ -10,32 +10,28 @@ namespace WCCOAPing.Ping
     {
         public bool GetStatus(string ip)
         {
-            throw new NotImplementedException();
+            bool isConnect;
+            try
+             {
+                isConnect = new System.Net.NetworkInformation.Ping().Send(ip).Status.ToString().Equals("Success");                
+             }
+             catch
+             {
+             isConnect = false;
+             }
+            return isConnect;
         }
 
         public Dictionary<string, bool> GetStatus(Dictionary<string, string> ip)
         {
+            var start = DateTime.Now;
             Dictionary<string, bool> result = new Dictionary<string, bool>();
             bool isConnect;
-            foreach(var value in ip)
+            foreach (var value in ip)
             {
-                try
-                {
-                    try
-                    {
-                        isConnect = new System.Net.NetworkInformation.Ping().Send(value.Value).Status.ToString().Equals("Success");
-                    }
-                    catch
-                    {
-                        isConnect = false;
-                    }
-                    result.Add(value.Key, isConnect);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"Errors (Class EthernetPing function GetStatus): {e}");
-                }
+               isConnect = GetStatus(value.Value);
             }
+            Console.WriteLine(DateTime.Now - start);
             return result;
         }
     }

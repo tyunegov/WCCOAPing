@@ -54,8 +54,8 @@
     <Compile Include="Ip\IIp.cs" />
     <Compile Include="Ip\WccIp.cs" />
     <Compile Include="Manager\ManagerWcc.cs" />
-    <Compile Include="Ping\IPing.cs" />
     <Compile Include="Ping\EthernetPing.cs" />
+    <Compile Include="Ping\IPing.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReduNumber\ReduNumConfig.cs" />

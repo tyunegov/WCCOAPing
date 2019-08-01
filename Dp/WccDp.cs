@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using WCCOAPing.reduNumber;
 
 namespace WCCOAPing.Dp
 {
@@ -23,20 +21,22 @@ namespace WCCOAPing.Dp
             try
             {
                 OaProcessModel values = manager.ProcessModel;
-                var dptAllIds = values.GetAllDpIdsForPattern("*", dptName);
-                string dptIds = dptAllIds.FirstOrDefault().ToString();
-                short typeId = Convert.ToInt16(dptIds.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                var dptIds = values.GetAllDpIdsForPattern("*", dptName).FirstOrDefault().ToString();
 
+                //todo Желательно переписать
+                short typeId = Convert.ToInt16(dptIds.ToString().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[1]);
                 OaDataPointType oaData = new OaDataPointType(manager, manager.GetCurrentSystemId(), typeId);
-                return oaData.GetAllDataPointNames().ToList();
+                return oaData.GetAllDataPointNames().ToList();                
             }
             catch (Exception e)
             {
                 Console.WriteLine("Errors (class WccDp function GetDpNamesByDPTName)" + e);
                 manager.Stop();
                 return null;
-            }
+            }            
         }
+
+
 
         public Dictionary<string, dynamic> ReadDpValue(List<string> dpNames, string node)
         {
@@ -50,7 +50,7 @@ namespace WCCOAPing.Dp
 
         public OaVariant ReadDpValue(string dpName, string node)
         {
-            OaVariant variant = null;
+            OaVariant variant;
             try
             {
                 variant = manager.ProcessValues.GetDpValue($"{systemName}:{dpName}.{node}:_original.._value").DpValue;

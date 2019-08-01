@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace WCCOAPing.Ping
 {
-    interface IPing
+    public interface IPing
     {
-        bool GetStatus(string ip);
         Dictionary<string, bool> GetStatus(Dictionary<string, string> ip);
+        bool GetStatus(string ip);
     }
 }
